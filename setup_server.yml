@@ -16,6 +16,17 @@
         groups: sudo
         append: yes
 
+    - name: Ensure OpenSSH server is installed
+      apt:
+        name: openssh-server
+        state: present
+
+    - name: Ensure SSH service is running
+      service:
+        name: ssh
+        state: started
+        enabled: yes
+
     - name: Set up authorized keys for the user rmacwha
       authorized_key:
         user: rmacwha
