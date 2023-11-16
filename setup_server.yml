@@ -83,13 +83,7 @@
       pip:
         name: docker
 
-    - name: Check if Portainer container is running
-      docker_container_info:
-        name: portainer
-      register: portainer_info
-
     - name: Deploy Portainer using Docker
-      when: "'portainer' not in portainer_info.containers"
       docker_container:
         name: portainer
         image: portainer/portainer-ce
