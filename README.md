@@ -29,6 +29,7 @@ ansible -v
 4. Run ansible
 ```bash
 ansible-playbook setup_server.yml
+ansible-playbook mount_smb_share.yml
 ```
 
 5. Setup portainer
