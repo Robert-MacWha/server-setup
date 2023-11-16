@@ -76,7 +76,7 @@
         group: "{{ user_name }}"
         mode: "0755"
 
-    - name: Update SMB Config
+    - name: Update SMB shares
       blockinfile:
         path: /etc/samba/smb.conf
         block: |
@@ -98,6 +98,19 @@
           valid users = {{ user_name }}
           create mask = 0775
           directory mask = 0775
+
+    - name: Disable home directories sharing in Samba
+      blockinfile:
+        path: /etc/samba/smb.conf
+        marker: "# {mark} ANSIBLE MANAGED BLOCK for homes"
+        block: |
+          # [homes]
+          #   comment = Home Directories
+          #   browseable = no
+          #   read only = yes
+        state: present
+      notify:
+        - restart samba
 
     - name: restart samba
       service:
