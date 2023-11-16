@@ -4,8 +4,7 @@
   vars_files:
     - vars/config.yml
   vars:
-    appdata_directory: "/home/{{ user_name }}/appdata"
-    link_path: "{{mount_point}}/appdata"
+    appdata_directory: "/appdata"
   tasks:
     - name: Install necessary packages
       apt:
