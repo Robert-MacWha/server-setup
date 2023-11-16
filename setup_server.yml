@@ -82,6 +82,12 @@
             state: started
             enabled: yes
 
+    - name: Add user to the Docker group
+      user:
+        name: "{{ user_name }}"
+        groups: docker
+        append: yes
+
     - name: Install Docker Module for Python
       pip:
         name: docker
