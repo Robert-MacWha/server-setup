@@ -61,13 +61,9 @@
         recurse: yes
 
     - name: Set read/write access to the user for the mount point
-      ansible.builtin.setfacl:
-        path: "{{ mount_point }}"
-        entity: "{{ user_name }}"
-        etype: user
-        permissions: rw
-        state: present
-        recursive: yes
+      command: setfacl -m u:{{ user_name }}:rwX -R {{ mount_point }}
+      args:
+        executable: /bin/bash
 
     - name: Configure Samba share
       blockinfile:
