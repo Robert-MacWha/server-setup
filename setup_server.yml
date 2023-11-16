@@ -1,0 +1,76 @@
+---
+- hosts: localhost
+  connection: local
+  become: true
+  tasks:
+    - name: Update all packages to the latest version
+      apt:
+        update_cache: yes
+        upgrade: dist
+
+    - name: Add user rmacwha
+      user:
+        name: rmacwha
+        shell: /bin/bash
+        groups: sudo
+        append: yes
+
+    - name: Set up authorized keys for the user rmacwha
+      authorized_key:
+        user: rmacwha
+        state: present
+        key: "{{ lookup('file', 'keys/id_rsa.pub') }}"
+
+    - name: Install required system packages
+      apt:
+        name: "{{ packages }}"
+        state: latest
+        update_cache: yes
+      vars:
+        packages:
+          - sudo
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+
+    - name: Add Docker’s official GPG key
+      apt_key:
+        url: https://download.docker.com/linux/debian/gpg
+        state: present
+
+    - name: Add Docker repository for Debian
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable
+        state: present
+        update_cache: yes
+
+    - name: Install Docker Engine
+      apt:
+        name: docker-ce
+        state: latest
+        update_cache: yes
+
+    - name: Ensure Docker service is running
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Install Docker Module for Python
+      pip:
+        name: docker
+
+    - name: Deploy Portainer using Docker
+      docker_container:
+        name: portainer
+        image: portainer/portainer-ce
+        state: started
+        restart_policy: always
+        ports:
+          - "8000:8000"
+          - "9000:9000"
+        volumes:
+          - "/var/run/docker.sock:/var/run/docker.sock"
+          - "portainer_data:/data"
