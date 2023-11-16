@@ -10,42 +10,57 @@
         name:
           - samba
           - samba-common
+          - parted
         state: present
 
-    - name: Format the drive
-      filesystem:
-        fstype: ext4
-        dev: "{{ drive_device }}"
-      when: format_drive | default(false)
+    - name: Check if the partition exists
+      command: lsblk -no FSTYPE "{{ drive_device }}"
+      register: partition_check
+      ignore_errors: true
+      changed_when: false
 
-    - name: Create a mount point
-      file:
-        path: "{{ mount_point }}"
-        state: directory
+    - name: Fail if the partition does not exist
+      fail:
+        msg: "The partition {{ drive_device }} does not exist."
+      when: partition_check.rc != 0
 
-    - name: Mount the drive
-      mount:
-        path: "{{ mount_point }}"
-        src: "{{ drive_device }}"
-        fstype: ext4
-        state: mounted
-        opts: defaults
+    - name: Setup drive
+      when: is_mounted.rc != 0
+      block:
+        - name: Format the drive
+          filesystem:
+            fstype: ext4
+            dev: "{{ drive_device }}"
+          when: format_drive | default(false)
 
-    - name: Configure Samba share
-      blockinfile:
-        path: /etc/samba/smb.conf
-        block: |
-          [{{ samba_share_name }}]
-          path = {{ mount_point }}
-          browseable = yes
-          writeable = yes
-          guest ok = yes
-          read only = yes
-          write list = {{ user_name }}
-          create mask = 0777
-          directory mask = 0777
-      notify:
-        - restart samba
+        - name: Create a mount point
+          file:
+            path: "{{ mount_point }}"
+            state: directory
+
+        - name: Mount the drive
+          mount:
+            path: "{{ mount_point }}"
+            src: "{{ drive_device }}"
+            fstype: ext4
+            state: mounted
+            opts: defaults
+
+        - name: Configure Samba share
+          blockinfile:
+            path: /etc/samba/smb.conf
+            block: |
+              [{{ samba_share_name }}]
+              path = {{ mount_point }}
+              browseable = yes
+              writeable = yes
+              guest ok = yes
+              read only = yes
+              write list = {{ user_name }}
+              create mask = 0777
+              directory mask = 0777
+          notify:
+            - restart samba
 
   handlers:
     - name: restart samba
