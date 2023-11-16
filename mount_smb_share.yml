@@ -62,10 +62,25 @@
         mode: "0775"
         recurse: yes
 
-    - name: Configure Media Samba share
+    - name: Check if appdata directory exists
+      stat:
+        path: "{{ appdata_directory }}"
+      register: appdata_stat
+
+    - name: Create appdata directory in user's home
+      when: not appdata_stat.stat.exists
+      file:
+        path: "{{ appdata_directory }}"
+        state: directory
+        owner: "{{ user_name }}"
+        group: "{{ user_name }}"
+        mode: "0755"
+
+    - name: Update SMB Config
       blockinfile:
         path: /etc/samba/smb.conf
         block: |
+          # Primary media share
           [{{ samba_share_name }}]
           path = {{ mount_point }}
           browseable = yes
@@ -75,26 +90,7 @@
           create mask = 0777
           directory mask = 0777
 
-    - name: Check if appdata directory exists
-      stat:
-        path: "{{ appdata_directory }}"
-      register: appdata_stat
-
-    - name: Create appdata link
-      when: not appdata_stat.stat.exists
-      block:
-        - name: Create appdata directory in user's home
-          file:
-            path: "{{ appdata_directory }}"
-            state: directory
-            owner: "{{ user_name }}"
-            group: "{{ user_name }}"
-            mode: "0755"
-
-    - name: Add appdata share to Samba configuration
-      blockinfile:
-        path: /etc/samba/smb.conf
-        block: |
+          # Docker Appdata share
           [AppData]
           path = {{ appdata_directory }}
           browseable = yes
