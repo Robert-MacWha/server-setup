@@ -62,8 +62,7 @@
         mode: "0775"
         recurse: yes
 
-    # turning on simlinks and wide links is generally unsafe, but should be fine since we're on a local network.
-    - name: Configure Samba share
+    - name: Configure Media Samba share
       blockinfile:
         path: /etc/samba/smb.conf
         block: |
@@ -72,13 +71,9 @@
           browseable = yes
           writeable = yes
           guest ok = yes
-          follow symlinks = yes
-          wide links = yes
           write list = {{ user_name }}
           create mask = 0777
           directory mask = 0777
-      notify:
-        - restart samba
 
     - name: Check if appdata directory exists
       stat:
@@ -96,14 +91,18 @@
             group: "{{ user_name }}"
             mode: "0755"
 
-        - name: Create symbolic link to appdata directory in the share
-          file:
-            src: "{{ appdata_directory }}"
-            dest: "{{ link_path }}"
-            state: link
-            force: yes
+    - name: Add appdata share to Samba configuration
+      blockinfile:
+        path: /etc/samba/smb.conf
+        block: |
+          [AppData]
+          path = {{ appdata_directory }}
+          browseable = yes
+          writeable = yes
+          valid users = {{ user_name }}
+          create mask = 0775
+          directory mask = 0775
 
-  handlers:
     - name: restart samba
       service:
         name: smbd
