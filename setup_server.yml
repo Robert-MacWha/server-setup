@@ -2,6 +2,7 @@
 - hosts: localhost
   connection: local
   become: true
+  gather_facts: yes
   tasks:
     - name: Update all packages to the latest version
       apt:
@@ -74,3 +75,7 @@
         volumes:
           - "/var/run/docker.sock:/var/run/docker.sock"
           - "portainer_data:/data"
+
+    - name: Display server's IP Address
+      debug:
+        msg: "Server IP Address: {{ ansible_default_ipv4.address }}"
