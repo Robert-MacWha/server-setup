@@ -52,38 +52,38 @@
             state: mounted
             opts: defaults
 
-        - name: Set ownership of the mount point
-          file:
-            path: "{{ mount_point }}"
-            owner: "{{ user_name }}"
-            group: "{{ user_name }}"
-            mode: "0775"
-            recurse: yes
+    - name: Set ownership of the mount point
+      file:
+        path: "{{ mount_point }}"
+        owner: "{{ user_name }}"
+        group: "{{ user_name }}"
+        mode: "0775"
+        recurse: yes
 
-        - name: Set read/write access to the user for the mount point
-          ansible.builtin.setfacl:
-            path: "{{ mount_point }}"
-            entity: "{{ user_name }}"
-            etype: user
-            permissions: rw
-            state: present
-            recursive: yes
+    - name: Set read/write access to the user for the mount point
+      ansible.builtin.setfacl:
+        path: "{{ mount_point }}"
+        entity: "{{ user_name }}"
+        etype: user
+        permissions: rw
+        state: present
+        recursive: yes
 
-        - name: Configure Samba share
-          blockinfile:
-            path: /etc/samba/smb.conf
-            block: |
-              [{{ samba_share_name }}]
-              path = {{ mount_point }}
-              browseable = yes
-              writeable = yes
-              guest ok = yes
-              read only = no
-              write list = {{ user_name }}
-              create mask = 0777
-              directory mask = 0777
-          notify:
-            - restart samba
+    - name: Configure Samba share
+      blockinfile:
+        path: /etc/samba/smb.conf
+        block: |
+          [{{ samba_share_name }}]
+          path = {{ mount_point }}
+          browseable = yes
+          writeable = yes
+          guest ok = yes
+          read only = no
+          write list = {{ user_name }}
+          create mask = 0777
+          directory mask = 0777
+      notify:
+        - restart samba
 
   handlers:
     - name: restart samba
