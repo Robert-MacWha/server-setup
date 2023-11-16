@@ -33,48 +33,63 @@
         state: present
         key: "{{ lookup('file', 'keys/id_rsa.pub') }}"
 
-    - name: Install required system packages
-      apt:
-        name: "{{ packages }}"
-        state: latest
-        update_cache: yes
-      vars:
-        packages:
-          - sudo
-          - apt-transport-https
-          - ca-certificates
-          - curl
-          - gnupg
-          - lsb-release
-
-    - name: Add Docker’s official GPG key
-      apt_key:
-        url: https://download.docker.com/linux/debian/gpg
-        state: present
-
-    - name: Add Docker repository for Debian
-      apt_repository:
-        repo: deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable
-        state: present
-        update_cache: yes
+    - name: Check if Docker is installed
+      command: docker --version
+      register: docker_installed
+      failed_when: false
+      changed_when: false
 
     - name: Install Docker Engine
-      apt:
-        name: docker-ce
-        state: latest
-        update_cache: yes
+      when: docker_installed.rc != 0
+      block:
+        - name: Install required system packages
+          apt:
+            name: "{{ packages }}"
+            state: latest
+            update_cache: yes
+          vars:
+            packages:
+              - sudo
+              - apt-transport-https
+              - ca-certificates
+              - curl
+              - gnupg
+              - lsb-release
 
-    - name: Ensure Docker service is running
-      service:
-        name: docker
-        state: started
-        enabled: yes
+        - name: Add Docker’s official GPG key
+          apt_key:
+            url: https://download.docker.com/linux/debian/gpg
+            state: present
+
+        - name: Add Docker repository for Debian
+          apt_repository:
+            repo: deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable
+            state: present
+            update_cache: yes
+
+        - name: Install Docker Engine
+          apt:
+            name: docker-ce
+            state: latest
+            update_cache: yes
+
+        - name: Ensure Docker service is running
+          service:
+            name: docker
+            state: started
+            enabled: yes
 
     - name: Install Docker Module for Python
       pip:
         name: docker
 
+    - name: Check if Portainer container is running
+      docker_container_info:
+        name: portainer
+      register: portainer_info
+
     - name: Deploy Portainer using Docker
+      when: "'portainer' not in portainer_info.containers"
       docker_container:
         name: portainer
         image: portainer/portainer-ce
