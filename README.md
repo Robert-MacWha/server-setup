@@ -5,7 +5,11 @@ Ansible scripts used to automate the setup of a privilaged ssh user, docker, and
 This automation should be used to install the bare minimum required to get portainer and associated services running.  Individual docker containers should be managed by docker-compose (ideally stacks) from within portainer and, while they may be included inside this repository for convenience, they should not automagically be deployed.
 
 ## Install Steps
-1. Login as root
+0. Ensure ansible config is setup correctly
+ - Ensure id_rsa.pub coresponds to correct device
+ - Ensure vars/config.yml is correctly configured
+
+1. Login to the server as root
 
 2. Install git and clone server-setup repo
 ```bash
@@ -26,3 +30,6 @@ ansible -v
 ```bash
 ansible-playbook setup_server.yml
 ```
+
+5. Setup portainer
+Navigate to `<server's ip>:9000` and create a portainer user

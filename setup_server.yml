@@ -3,6 +3,9 @@
   connection: local
   become: true
   gather_facts: yes
+  vars_files:
+    - vars/config.yml
+
   tasks:
     - name: Update all packages to the latest version
       apt:
@@ -11,7 +14,7 @@
 
     - name: Add user rmacwha
       user:
-        name: rmacwha
+        name: "{{ user_name }}"
         shell: /bin/bash
         groups: sudo
         append: yes
@@ -29,7 +32,7 @@
 
     - name: Set up authorized keys for the user rmacwha
       authorized_key:
-        user: rmacwha
+        user: "{{ user_name }}"
         state: present
         key: "{{ lookup('file', 'keys/id_rsa.pub') }}"
 

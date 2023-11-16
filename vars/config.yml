@@ -1,0 +1,4 @@
+drive_device: /dev/sdb1 # Replace with your drive device
+mount_point: /mnt/mydrive # Replace with your desired mount point
+samba_share_name: myshare # Replace with your desired share name
+user_name: rmacwha # Replace with your desired user name

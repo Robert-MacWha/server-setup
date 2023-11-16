@@ -1,0 +1,54 @@
+---
+- hosts: localhost
+  become: true
+  vars_files:
+    - vars/config.yml
+
+  tasks:
+    - name: Install necessary packages
+      apt:
+        name:
+          - samba
+          - samba-common
+        state: present
+
+    - name: Format the drive
+      filesystem:
+        fstype: ext4
+        dev: "{{ drive_device }}"
+      when: format_drive | default(false)
+
+    - name: Create a mount point
+      file:
+        path: "{{ mount_point }}"
+        state: directory
+
+    - name: Mount the drive
+      mount:
+        path: "{{ mount_point }}"
+        src: "{{ drive_device }}"
+        fstype: ext4
+        state: mounted
+        opts: defaults
+
+    - name: Configure Samba share
+      blockinfile:
+        path: /etc/samba/smb.conf
+        block: |
+          [{{ samba_share_name }}]
+          path = {{ mount_point }}
+          browseable = yes
+          writeable = yes
+          guest ok = yes
+          read only = yes
+          write list = {{ user_name }}
+          create mask = 0777
+          directory mask = 0777
+      notify:
+        - restart samba
+
+  handlers:
+    - name: restart samba
+      service:
+        name: smbd
+        state: restarted
