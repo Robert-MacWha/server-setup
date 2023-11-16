@@ -71,7 +71,8 @@
           browseable = yes
           writeable = yes
           guest ok = yes
-          read only = no
+          follow symlinks = yes # turning on simlinks and wide links is generally unsafe, but should be fine since we're on a local network.
+          wide links = yes
           write list = {{ user_name }}
           create mask = 0777
           directory mask = 0777
