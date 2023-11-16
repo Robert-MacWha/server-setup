@@ -60,11 +60,6 @@
         mode: "0775"
         recurse: yes
 
-    - name: Set read/write access to the user for the mount point
-      command: setfacl -m u:{{ user_name }}:rwX -R {{ mount_point }}
-      args:
-        executable: /bin/bash
-
     - name: Configure Samba share
       blockinfile:
         path: /etc/samba/smb.conf
