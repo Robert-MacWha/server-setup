@@ -24,6 +24,12 @@
         msg: "The partition {{ drive_device }} does not exist."
       when: partition_check.rc != 0
 
+    - name: Check if drive is already mounted
+      shell: mount | grep "{{ mount_point }}"
+      register: is_mounted
+      changed_when: false
+      ignore_errors: true
+
     - name: Setup drive
       when: is_mounted.rc != 0
       block:
