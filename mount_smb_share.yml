@@ -62,6 +62,7 @@
         mode: "0775"
         recurse: yes
 
+    # turning on simlinks and wide links is generally unsafe, but should be fine since we're on a local network.
     - name: Configure Samba share
       blockinfile:
         path: /etc/samba/smb.conf
@@ -71,7 +72,7 @@
           browseable = yes
           writeable = yes
           guest ok = yes
-          follow symlinks = yes # turning on simlinks and wide links is generally unsafe, but should be fine since we're on a local network.
+          follow symlinks = yes
           wide links = yes
           write list = {{ user_name }}
           create mask = 0777
