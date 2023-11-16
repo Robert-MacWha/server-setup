@@ -61,7 +61,7 @@
               browseable = yes
               writeable = yes
               guest ok = yes
-              read only = yes
+              read only = no
               write list = {{ user_name }}
               create mask = 0777
               directory mask = 0777

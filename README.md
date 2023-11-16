@@ -21,18 +21,20 @@ git clone https://github.com/Robert-MacWha/server-setup.git
 cd server-setup
 ```
 
-3. Setup storage partition
+3. Setup storage partition <!-- This step could be automated, but it feels dangerous. Still - might be more dangerous to have someone attempting to setup partitions without knowing what they're doing. -->
 ```bash
-lsblk # locate the data disk's name. in this example, `sdb`
-fdisk /dev/sdb
+apt install gdisk
+gdisk /dev/sdb # replace `sdb` with whatever disk you're using
     n
-    (default) (p)
-    (default) (1)
-    (default) (2048)
-    (default) (large number)
-    p # ensure the partition was created correctly
+    (default) # 1
+    (default) # 2048
+    (default) # large number
+    (default) # 8300
+    p # ensure the file system matches what you expect
     w
-lsblk # `sdb/sdb1` should now exist
+    y
+lsblk # ensure /dev/sdb1 was created and fills the disk
+mkfs.ext4 /dev/sdb1
 ```
 
 4. Install ansible
@@ -44,9 +46,17 @@ ansible -v
 
 5. Run ansible
 ```bash
-ansible-playbook setup_server.yml
 ansible-playbook mount_smb_share.yml
+ansible-playbook setup_server.yml
 ```
 
 6. Setup portainer
 Navigate to `<server's ip>:9000` and create a portainer user
+
+7. Setup SMB access
+ - Open windows file explorer, right click "This PC", and press "Map Network Drive..."
+ - Enter the network drive's ip address followed by the share folder: `\\<ip-address>\home`
+ - Tick "Connect using different credentials"
+ - Press finish, then enter your server user's credentials from config.yml
+
+> If you didn't connect using different credentials when creating the mapping, you can search for "credential manager" and enter the credentials under "windows credentials"
