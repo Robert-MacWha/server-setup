@@ -50,6 +50,11 @@ ansible-playbook mount_smb_share.yml
 ansible-playbook setup_server.yml
 ```
 
+6. Set smbuser password
+```bash
+smbpasswd -a rmacwha # I recommend setting to the same as the debian password for simplicity
+```
+
 6. Setup portainer
 Navigate to `<server's ip>:9000` and create a portainer user
 
