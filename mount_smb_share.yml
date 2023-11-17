@@ -90,7 +90,7 @@
           directory mask = 0777
 
           # Docker Appdata share
-          [AppData]
+          [Appdata]
           path = {{ appdata_directory }}
           browseable = yes
           writeable = yes
