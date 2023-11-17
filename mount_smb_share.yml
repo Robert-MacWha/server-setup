@@ -108,10 +108,8 @@
           #   browseable = no
           #   read only = yes
         state: present
-      notify:
-        - restart samba
 
-    - name: restart samba
+    - name: Restart samba
       service:
         name: smbd
         state: restarted
