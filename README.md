@@ -1,5 +1,4 @@
-# Server Setup
-Ansible scripts used to automate the setup of a privilaged ssh user, docker, and portainer on new servers.
+
 
 ## Automation scope
 This automation should be used to install the bare minimum required to get portainer and associated services running.  Individual docker containers should be managed by docker-compose (ideally stacks) from within portainer and, while they may be included inside this repository for convenience, they should not automagically be deployed.
@@ -56,7 +55,7 @@ smbpasswd -a rmacwha # I recommend setting to the same as the debian password fo
 ```
 
 6. Setup portainer
-Navigate to `<server's ip>:9000` and create a portainer user
+Navigate to `<server's ip>:9000` and create a portainer user (I recommend later setting up a static IP for the server).
 
 7. Setup SMB access
  - Open windows file explorer, right click "This PC", and press "Map Network Drive..."

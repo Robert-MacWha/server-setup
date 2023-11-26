@@ -56,8 +56,8 @@
     - name: Set ownership of the mount point
       file:
         path: "{{ mount_point }}"
-        owner: "{{ user_name }}"
-        group: "{{ user_name }}"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
         mode: "0775"
         recurse: yes
 
@@ -71,8 +71,8 @@
       file:
         path: "{{ appdata_directory }}"
         state: directory
-        owner: "{{ user_name }}"
-        group: "{{ user_name }}"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
         mode: "0755"
 
     - name: Update SMB shares
@@ -85,7 +85,7 @@
           browseable = yes
           writeable = yes
           guest ok = yes
-          write list = {{ user_name }}
+          write list = {{ ansible_user }}
           create mask = 0777
           directory mask = 0777
 
@@ -94,7 +94,7 @@
           path = {{ appdata_directory }}
           browseable = yes
           writeable = yes
-          valid users = {{ user_name }}
+          valid users = {{ ansible_user }}
           create mask = 0775
           directory mask = 0775
 

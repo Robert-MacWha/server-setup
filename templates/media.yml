@@ -1,0 +1,18 @@
+---
+version: "3"
+services:
+  jellyfin:
+    image: linuxserver/jellyfin:latest
+    container_name: jellyfin
+
+    ports:
+      - 8096:8096
+    volumes:
+      - /appdata/jellyfin:/config
+      - /mnt/home/media:/media
+      - /mnt/home/downloads/torrents:/torrents
+    environment:
+      - PUID=1000
+      - PGID=1000
+
+    restart: unless-stopped

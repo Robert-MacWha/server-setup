@@ -1,0 +1,82 @@
+---
+version: "3"
+services:
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: gluetun
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - VPN_SERVICE_PROVIDER=protonvpn
+      - OPENVPN_USER=
+      - OPENVPN_PASSWORD=
+      - SERVER_COUNTRIES=Canada
+      - VPN_PORT_FORWARDING=on
+    ports:
+      - 5900:5800 # jdownloader
+      - 9091:9091 # transmission
+      - 8989:8989 # sonarr
+      - 7878:7878 # radarr
+      - 9696:9696 # prowlarr
+    volumes:
+      - /appdata/transmission/forwarded_port:/tmp/gluetun/forwarded_port
+    restart: unless-stopped
+
+  prowlarr:
+    image: linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /appdata/prowlarr:/config
+    network_mode: service:gluetun
+    restart: unless-stopped
+
+  sonarr:
+    image: linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /appdata/sonarr:/config
+      - /mnt/home/downloads/torrents:/downloads
+      - /mnt/home/downloads/torrents/shows:/shows
+    network_mode: service:gluetun
+    restart: unless-stopped
+
+  radarr:
+    image: linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /appdata/radarr:/config
+      - /mnt/home/downloads/torrents:/downloads
+      - /mnt/home/downloads/torrents/movies:/movies
+    network_mode: service:gluetun
+    restart: unless-stopped
+
+  transmission:
+    image: linuxserver/transmission
+    container_name: transmission
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /appdata/transmission:/config
+      - /mnt/home/downloads/torrents:/downloads
+    network_mode: service:gluetun
+    restart: unless-stopped
+
+  jdownloader:
+    image: jlesage/jdownloader-2:latest
+    container_name: jdownloader
+    user: "1000:1000"
+    volumes:
+      - /appdata/jdownloader:/config
+      - /mnt/home/downloads:/output
+    network_mode: service:gluetun
+    restart: unless-stopped
