@@ -1,0 +1,32 @@
+---
+- name: Ensure /appdata directory exists
+  ansible.builtin.file:
+    path: { { appdata_dir } }
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0755"
+
+- name: Install Samba
+  ansible.builtin.apt:
+    name: samba
+    state: present
+
+- name: Configure appdata Samba share
+  ansible.builtin.blockinfile:
+    path: /etc/samba/smb.conf
+    block: |
+      [appdata]
+      comment = Docker Configurations
+      path = {{ appdata_dir }}
+      browseable = yes
+      writable = no
+      guest ok = yes
+      create mask = 0755
+      directory mask = 0755
+    marker: "# {mark} ANSIBLE MANAGED BLOCK FOR APPDATA"
+
+- name: Restart Samba service
+  ansible.builtin.service:
+    name: smbd
+    state: restarted

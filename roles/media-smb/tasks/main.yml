@@ -1,0 +1,24 @@
+---
+- name: Install Samba
+  ansible.builtin.apt:
+    name: samba
+    state: present
+
+- name: Configure media Samba share
+  ansible.builtin.blockinfile:
+    path: /etc/samba/smb.conf
+    block: |
+      [media]
+      comment = Docker Configurations
+      path = {{ media_dir }}
+      browseable = yes
+      writable = no
+      guest ok = yes
+      create mask = 0755
+      directory mask = 0755
+    marker: "# {mark} ANSIBLE MANAGED BLOCK FOR MEDIA"
+
+- name: Restart Samba service
+  ansible.builtin.service:
+    name: smbd
+    state: restarted

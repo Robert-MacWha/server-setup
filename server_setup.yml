@@ -10,3 +10,5 @@
     - portainer
     - nvidia
     - nvidia-container
+    - appdata-smb
+    - media-smb
