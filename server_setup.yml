@@ -1,0 +1,12 @@
+---
+- hosts: homeserver
+  become: true
+  gather_facts: true
+  vars:
+    ansible_architecture: "amd64"
+  roles:
+    - common
+    - docker
+    - portainer
+    - nvidia
+    - nvidia-container

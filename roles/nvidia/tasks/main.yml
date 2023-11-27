@@ -1,0 +1,31 @@
+--- # https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html
+- name: Install necessary packages for adding repositories
+  apt:
+    name:
+      - software-properties-common
+      - gnupg2
+    state: present
+    update_cache: yes
+
+- name: Add non-free repository for NVIDIA Driver
+  lineinfile:
+    path: /etc/apt/sources.list
+    line: "deb http://deb.debian.org/debian/ {{ ansible_distribution_release }} main contrib non-free non-free-firmware"
+    state: present
+
+- name: Refresh Packages
+  apt:
+    update_cache: yes
+    upgrade: dist
+
+- name: Install NVIDIA Driver
+  apt:
+    name:
+      - nvidia-driver
+      - firmware-misc-nonfree
+    state: present
+
+- name: Reboot the machine to apply driver installation
+  reboot:
+    msg: "Rebooting for NVIDIA driver"
+    reboot_timeout: 300

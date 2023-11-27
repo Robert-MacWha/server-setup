@@ -1,4 +1,0 @@
-ansible_user: rmacwha # Replace with your desired user name
-drive_device: /dev/sdb1 # Replace with your drive device
-mount_point: /mnt/media # Replace with your desired mount point
-samba_share_name: Home # Replace with your desired share name

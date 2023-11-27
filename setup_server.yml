@@ -1,7 +1,0 @@
----
-- hosts: homeserver
-  become: true
-  roles:
-    - common
-    - docker
-    - portainer
